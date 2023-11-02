@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1058925023973",
+    "project_id": "menu-islem",
+    "storage_bucket": "menu-islem.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1058925023973:android:58efa319fe6d66c7353a0c",
+        "android_client_info": {
+          "package_name": "com.islem.menu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5nEXknFXJ1CqUnM9R0y6bK6vRCQwo4fM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
