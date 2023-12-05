@@ -63,7 +63,8 @@ class _LoginState extends State<Login> {
                         style: TextStyle(color: Color(0xFFE85852)),
                       ),
                     ),
-                  )
+                  ),
+
                 ],
               ),
             ),

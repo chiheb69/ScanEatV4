@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:ChezIslem/Database/Food/food.dart';
 import 'package:ChezIslem/Database/Food/foodDB.dart';
+import '../Login/admin_login.dart';
 import '../Settings/Order.dart';
 import '../Settings/settingsAdmin.dart';
 
@@ -51,7 +52,7 @@ class _AdminHomeState extends State<AdminHome> {
               ),
               Tab(
                 icon: Icon(Icons.settings, size: 28),
-                text: 'Settings',
+                text: 'Menu',
               ),
               Tab(
                 icon: Icon(Icons.food_bank_outlined, size: 28),
@@ -166,7 +167,7 @@ class _AdminFirstPageState extends State<AdminFirstPage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-          /*--------------------------App Bar--------------------------*/
+        /*--------------------------App Bar--------------------------*/
           appBar: AppBar(
             title: const Text('Admin'),
             backgroundColor: Colors.redAccent,
@@ -243,7 +244,7 @@ class _AdminFirstPageState extends State<AdminFirstPage> {
                       child: ElevatedButton(
                         style: ButtonStyle(
                           backgroundColor:
-                              MaterialStateProperty.all(Colors.redAccent),
+                          MaterialStateProperty.all(Colors.redAccent),
                         ),
                         onPressed: () {
                           String url = selectedValue!;
@@ -266,7 +267,7 @@ class _AdminFirstPageState extends State<AdminFirstPage> {
                       child: ElevatedButton(
                         style: ButtonStyle(
                           backgroundColor:
-                              MaterialStateProperty.all(Colors.redAccent),
+                          MaterialStateProperty.all(Colors.redAccent),
                         ),
                         onPressed: () {
                           String url = selectedValue!;
@@ -303,69 +304,28 @@ class _AdminFirstPageState extends State<AdminFirstPage> {
                     color: Colors.redAccent,
                   ),
                 ),
-                SingleChildScrollView(
-                  reverse: true,
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.all(8),
-                      itemCount: food.length,
-                      itemBuilder: (context, int index) {
-                        return  Column(
-                            children: [
-                              ListTile(
-                                  title: Text('${food[index].name}'),
-                                  subtitle: Text(
-                                      '${food[index].price}\$ \n${food[index].rate} stars'),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          nameController.text =
-                                              food[index].name ?? '';
-                                          priceController.text =
-                                              food[index].price.toString() ??
-                                                  '';
-                                          rateController.text =
-                                              food[index].rate.toString() ?? '';
-                                          clientsController.text =
-                                              food[index].clients.toString() ??
-                                                  '';
-                                          setState(() {
-                                            this.index = index;
-                                          });
-                                        },
-                                        child: const Icon(
-                                            Icons.edit_note_outlined),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          _delete(food[index].foodId);
-                                          _queryAll();
-                                        },
-                                        child: const Icon(Icons.delete_outline),
-                                      ),
-                                    ],
-                                  ),
-                                  leading: Image(
-                                    image: AssetImage(food[index].url!),
-                                  )),
-                              const SizedBox(
-                                width: 350,
-                                child: Divider(
-                                  thickness: 1,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
+                ListTile(
+                    title: TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const AdminLogin())
                         );
-                      }),
-                )
+                      },
+                      child: const Text(
+                        'Sign Out',
+                        style: TextStyle(
+                          color: Color(0xFFE85852),
+                          fontSize: 18,
+                        ),
+                      ),
+                    )),
+
               ],
             ),
           )
-          /*---------------------------Body---------------------------*/
-          ),
+        /*---------------------------Body---------------------------*/
+      ),
     );
   }
 }

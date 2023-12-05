@@ -29,7 +29,7 @@ class FoodCard extends StatelessWidget {
           Stack(
             children: <Widget>[
               Container(
-                height: 140.0,
+                height: 90.0,
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage(productUrl),

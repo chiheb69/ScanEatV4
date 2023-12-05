@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
-import '../Login/admin_login.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SettingsAdmin extends StatefulWidget {
-  const SettingsAdmin({super.key});
+  const SettingsAdmin({Key? key});
 
   @override
   State<SettingsAdmin> createState() => _SettingsAdminState();
@@ -11,11 +10,15 @@ class SettingsAdmin extends StatefulWidget {
 
 class _SettingsAdminState extends State<SettingsAdmin> {
 
+  void _deleteOrder(String menuId) async {
+    await FirebaseFirestore.instance.collection('menu').doc(menuId).delete();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SettingsAdmin'),
+        title: const Text('Menu'),
         backgroundColor: const Color(0xFFE85852),
         automaticallyImplyLeading: false,
       ),
@@ -24,77 +27,68 @@ class _SettingsAdminState extends State<SettingsAdmin> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Common',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Color(0xFFE85852),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const ListTile(
-              leading: Icon(Icons.language),
-              title: Text('Language'),
-              subtitle: Text('English'),
-            ),
-            const Divider(
-              thickness: 0.5,
-              color: Colors.grey,
-            ),
-            const ListTile(
-              leading: Icon(Icons.account_tree_rounded),
-              title: Text('Version'),
-              subtitle: Text('Version 1'),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Account',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Color(0xFFE85852),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const ListTile(
-              leading: Icon(Icons.phone),
-              title: Text('Phone Number'),
-            ),
-            const Divider(
-              thickness: 0.5,
-              color: Colors.grey,
-            ),
-            const ListTile(
-              leading: Icon(Icons.mail),
-              title: Text('Email'),
-            ),
-            const SizedBox(height: 16),
-            const Divider(
-              thickness: 1,
-              color: Colors.grey,
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-                title: TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const AdminLogin())
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance.collection('menu').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(),
                     );
-                  },
-                  child: const Text(
-                    'Sign Out',
-                    style: TextStyle(
-                      color: Color(0xFFE85852),
-                      fontSize: 18,
-                    ),
-                  ),
-                )),
+                  }
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Error: ${snapshot.error}'),
+                    );
+                  }
+
+                  // Process the data from the snapshot
+                  final List<DocumentSnapshot> documents = snapshot.data!.docs;
+                  return ListView.builder(
+                    itemCount: documents.length,
+                    itemBuilder: (context, index) {
+                      final menu = documents[index];
+                      final menuId = menu.id; // Get the document ID
+                      final name = menu['name'];
+                      final price = menu['price'];
+                      final url = menu['url']; // Assuming you have a field named 'imgUrl'
+
+                      return Card(
+                        child: ListTile(
+                          title: Text(name),
+                          subtitle: Text('Price: $price'),
+                          leading: Container(
+                            width: 50, // Set the width of the image container
+                            height: 50, // Set the height of the image container
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(url), // Use the imgUrl from the document
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              // Call the method to delete the order
+                              _deleteOrder(menuId);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
           ],
         ),
+
       ),
+
+
+
+
     );
   }
 }
-
