@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:ChezIslem/Database/Food/foodDB.dart';
 import 'package:ChezIslem/Database/CartDatabase/cartDB.dart';
 import 'package:ChezIslem/Database/CartDatabase/cartModel.dart';
@@ -7,7 +6,7 @@ import 'package:ChezIslem/Database/Food/food.dart';
 import 'foodCard.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  const Home({Key? key}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
@@ -69,7 +68,7 @@ class _HomeState extends State<Home> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide:
-                        BorderSide(color: theme.primaryColor, width: 1.0),
+                    BorderSide(color: theme.primaryColor, width: 1.0),
                   ),
                   prefixIcon: Icon(
                     Icons.search,
@@ -112,35 +111,35 @@ class _HomeState extends State<Home> {
                       showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                                title: Text(foodList[index].name!),
-                                content: Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.3,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                          image: AssetImage(
-                                              foodList[index].url!))),
-                                  child: Text('${foodList[index].price}\$'),
-                                ),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () {
-                                        _insertCart(
-                                            foodList[index].url,
-                                            foodList[index].name,
-                                            foodList[index].price,
-                                            foodList[index].rate,
-                                            foodList[index].clients);
-                                      },
-                                      child: const Text(
-                                        'Add to cart',
-                                        style:
-                                            TextStyle(color: Color(0xFFE85852)),
-                                      ))
-                                ],
-                              ));
+                            title: Text(foodList[index].name!),
+                            content: Container(
+                              height:
+                              MediaQuery.of(context).size.height * 0.3,
+                              width:
+                              MediaQuery.of(context).size.width * 0.5,
+                              decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      image: AssetImage(
+                                          foodList[index].url!))),
+                              child: Text('${foodList[index].price}\$'),
+                            ),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    _insertCart(
+                                        foodList[index].url,
+                                        foodList[index].name,
+                                        foodList[index].price,
+                                        foodList[index].rate,
+                                        foodList[index].clients);
+                                  },
+                                  child: const Text(
+                                    'Add to cart',
+                                    style: TextStyle(
+                                        color: Color(0xFFE85852)),
+                                  ))
+                            ],
+                          ));
                     },
                     child: Hero(
                       tag: 'detail_food$index',

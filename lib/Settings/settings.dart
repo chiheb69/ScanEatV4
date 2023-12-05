@@ -3,6 +3,8 @@ import 'package:ChezIslem/Database/Food/foodDB.dart';
 import 'package:ChezIslem/Database/Food/food.dart';
 import 'package:ChezIslem/auth.dart';
 
+import '../Login/login_register.dart';
+
 class Settings extends StatefulWidget {
   const Settings({super.key});
 
@@ -87,18 +89,26 @@ class _SettingsState extends State<Settings> {
               color: Colors.grey,
             ),
             const SizedBox(height: 16),
-            ListTile(
-                title: TextButton(
-              onPressed: signOut,
-              child: const Text(
-                'Sign Out',
-                style: TextStyle(
-                  color: Color(0xFFE85852),
-                  fontSize: 18,
-                ),
-              ),
-            )),
-          ],
+          ListTile(
+          title: TextButton(
+          onPressed: () {
+      // Navigate to the login page
+      Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Login()),
+    );
+  },
+    child: const Text(
+    'Sign Out',
+    style: TextStyle(
+    color: Color(0xFFE85852),
+    fontSize: 18,
+    ),
+    ),
+    ),
+
+
+          )],
         ),
       ),
     );

@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:ChezIslem/Database/Food/food.dart';
 import 'package:ChezIslem/Database/Food/foodDB.dart';
+import '../Settings/Order.dart';
 import '../Settings/settingsAdmin.dart';
 
 class AdminHome extends StatefulWidget {
@@ -25,12 +27,13 @@ class _AdminHomeState extends State<AdminHome> {
   @override
   Widget build(BuildContext context) {
     return const DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         body: TabBarView(
           children: <Widget>[
             AdminFirstPage(),
             SettingsAdmin(),
+            OrderAdmin(),
           ],
         ),
         bottomNavigationBar: Material(
@@ -50,6 +53,11 @@ class _AdminHomeState extends State<AdminHome> {
                 icon: Icon(Icons.settings, size: 28),
                 text: 'Settings',
               ),
+              Tab(
+                icon: Icon(Icons.food_bank_outlined, size: 28),
+                text: 'Order',
+              ),
+
             ],
           ),
         ),
@@ -82,6 +90,7 @@ class _AdminFirstPageState extends State<AdminFirstPage> {
     setState(() {});
   }
 
+
   void _update(id, url, name, price, rate, clients) async {
     Food person = Food(id, url, name, price, rate, clients);
     final rowsAffected = await dbHelper.update(person);
@@ -95,10 +104,23 @@ class _AdminFirstPageState extends State<AdminFirstPage> {
       FoodDatabase.columnRate: rate,
       FoodDatabase.columnClients: clients,
     };
+
     Food food = Food.fromMap(row);
+
     final id = await dbHelper.insert(food);
+
+    // Add the item to Firestore
+    FirebaseFirestore.instance.collection('menu').add({
+      'url': url,
+      'name': name,
+      'price': price,
+      'rate': rate,
+      'clients': clients,
+    });
+
     _showMessageInScaffold('inserted row id: $id');
   }
+
 
   void _delete(id) async {
     final rowsDeleted = await dbHelper.delete(id);

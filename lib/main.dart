@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'Home/home.dart';
 import 'widget_tree.dart';
 
 Future<void> main() async {
@@ -14,6 +15,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      routes: {
+        '/home': (context) => Home(),
+        // other routes...
+      },
       debugShowCheckedModeBanner: false,
         theme: ThemeData(
         primaryColor: const Color(0xFFE85852),

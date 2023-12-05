@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:ChezIslem/header.dart';
 import 'package:ChezIslem/Database/CartDatabase/cartDB.dart';
@@ -34,6 +35,17 @@ class _CartState extends State<Cart> with TickerProviderStateMixin {
   void _delete(id) async {
     final rowsDeleted = await dbHelper.delete(id);
     _queryAll();
+    setState(() {}); // Add this line to trigger a UI update
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _queryAll();
+  }
+
+  void _clearCart() {
+    // Clear the local cart list
+    foodList.clear();
   }
 
   void _insert(url, name, price, rate, clients) async {
@@ -46,13 +58,22 @@ class _CartState extends State<Cart> with TickerProviderStateMixin {
     };
     CartModel cart = CartModel.fromMap(row);
     final id = await dbHelper.insert(cart);
+    await FirebaseFirestore.instance.collection('cartItems').add({
+      'url': url,
+      'name': name,
+      'price': price,
+      'rate': rate,
+      'clients': clients,
+    });
   }
 
   Widget renderAddList() {
     return ListView.builder(
       itemCount: foodList.length,
       itemBuilder: (BuildContext context, int index) {
-        Color primaryColor = Theme.of(context).primaryColor;
+        Color primaryColor = Theme
+            .of(context)
+            .primaryColor;
         return Container(
           margin: EdgeInsets.only(bottom: 10.0),
           child: GestureDetector(
@@ -133,7 +154,9 @@ class _CartState extends State<Cart> with TickerProviderStateMixin {
     return ListView.builder(
       itemCount: foodList.length,
       itemBuilder: (BuildContext context, int index) {
-        Color primaryColor = Theme.of(context).primaryColor;
+        Color primaryColor = Theme
+            .of(context)
+            .primaryColor;
         return Container(
           margin: const EdgeInsets.only(bottom: 10.0),
           child: GestureDetector(
@@ -195,7 +218,9 @@ class _CartState extends State<Cart> with TickerProviderStateMixin {
     return ListView.builder(
       itemCount: foodList.length,
       itemBuilder: (BuildContext context, int index) {
-        Color primaryColor = Theme.of(context).primaryColor;
+        Color primaryColor = Theme
+            .of(context)
+            .primaryColor;
         return Container(
           margin: const EdgeInsets.only(bottom: 10.0),
           child: GestureDetector(
@@ -223,7 +248,7 @@ class _CartState extends State<Cart> with TickerProviderStateMixin {
                           children: <Widget>[
                             Padding(
                               padding:
-                                  const EdgeInsets.symmetric(vertical: 5.0),
+                              const EdgeInsets.symmetric(vertical: 5.0),
                               // child: Text(cart['name']),
                             ),
                             Text('${foodList[index].price}\$'),
@@ -231,7 +256,7 @@ class _CartState extends State<Cart> with TickerProviderStateMixin {
                                 padding: const EdgeInsets.only(top: 8.0),
                                 child: Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  MainAxisAlignment.spaceBetween,
                                   children: <Widget>[
                                     // Text(cart['rate']),
                                     Text(
@@ -259,7 +284,9 @@ class _CartState extends State<Cart> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    Size size = MediaQuery.of(context).size;
+    Size size = MediaQuery
+        .of(context)
+        .size;
 
     return SafeArea(
       child: Column(
@@ -306,13 +333,20 @@ class _CartState extends State<Cart> with TickerProviderStateMixin {
                           borderRadius: BorderRadius.circular(10.0),
                           color: theme.primaryColor,
                         ),
-                        child: Text(
-                          'CHECKOUT',
-                          style: TextStyle(
-                            color: Colors.white,
+                        child: TextButton(
+                          onPressed: () {
+                            // Call the method to insert into Firebase
+                            _insertIntoFirebase();
+                          },
+                          child: Text(
+                            'CHECKOUT',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
+
                     ],
                   ),
                   Column(
@@ -343,7 +377,7 @@ class _CartState extends State<Cart> with TickerProviderStateMixin {
                             Text(
                               'View Tracking Order',
                               style: TextStyle(
-                                  color: Colors.white, fontSize: 16.0),
+                                  color: Colors.white, fontSize: 10.0),
                             ),
                           ],
                         ),
@@ -359,4 +393,90 @@ class _CartState extends State<Cart> with TickerProviderStateMixin {
       ),
     );
   }
+
+  void _insertIntoFirebase() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String name = '';
+        String tableNumber = '';
+
+        return AlertDialog(
+          title: Text('Enter Name and Table Number'),
+          content: Column(
+            children: <Widget>[
+              TextField(
+                decoration: InputDecoration(labelText: 'Name'),
+                onChanged: (value) {
+                  name = value;
+                },
+              ),
+              TextField(
+                decoration: InputDecoration(labelText: 'Table Number'),
+                onChanged: (value) {
+                  tableNumber = value;
+                },
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _insertItemsIntoFirebase(name, tableNumber);
+
+                // Automatically trigger the delete operation
+                _deleteItems();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteItems() {
+    // Iterate through the foodList and call _delete for each item
+    for (var item in foodList) {
+      _delete(item.cartId);
+    }
+  }
+
+  bool checkoutSuccessful = false;
+  void _insertItemsIntoFirebase(String name, String tableNumber) async {
+    // Create a list to hold all items for the current order
+    List<Map<String, dynamic>> orderItems = [];
+
+    for (var item in foodList) {
+      // Add each item to the orderItems list
+      orderItems.add({
+        'url': item.url,
+        'itemName': item.name,
+        'price': item.price,
+        'rate': item.rate,
+        'clients': item.clients,
+      });
+    }
+
+    // Add all items to the 'orders' collection under the same document
+    await FirebaseFirestore.instance.collection('orders').add({
+      'name': name,
+      'tableNumber': tableNumber,
+      'orderItems': orderItems, // Add the list of items to the document
+    }).then((value) {
+      // Clear the cart after successful checkout
+      _clearCart();
+      setState(() {});
+    });
+  }
+
+
+
 }
